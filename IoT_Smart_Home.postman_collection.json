@@ -1,0 +1,197 @@
+{
+    "info": {
+        "_postman_id": "iot-smart-home-api",
+        "name": "IoT Smart Home API",
+        "description": "3 RESTful API Endpoints cho IoT Smart Home System",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "1. Device Control",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"device\": \"lamp\",\n  \"status\": \"on\"\n}",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    }
+                },
+                "url": {
+                    "raw": "http://localhost:3000/api/device-control",
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "3000",
+                    "path": [
+                        "api",
+                        "device-control"
+                    ]
+                },
+                "description": "Điều khiển thiết bị\n\n**Body:**\n```json\n{\n  \"device\": \"lamp\" | \"fan\" | \"pump\",\n  \"status\": \"on\" | \"off\"\n}\n```"
+            }
+        },
+        {
+            "name": "2. Active History",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "http://localhost:3000/api/active-history?page=1&limit=20&sortBy=id&sortOrder=desc&keyword=",
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "3000",
+                    "path": [
+                        "api",
+                        "active-history"
+                    ],
+                    "query": [
+                        {
+                            "key": "page",
+                            "value": "1",
+                            "description": "Số trang"
+                        },
+                        {
+                            "key": "limit",
+                            "value": "20",
+                            "description": "Số bản ghi mỗi trang"
+                        },
+                        {
+                            "key": "sortBy",
+                            "value": "id",
+                            "description": "Cột sắp xếp: id, device, action, status, time"
+                        },
+                        {
+                            "key": "sortOrder",
+                            "value": "desc",
+                            "description": "Thứ tự: asc, desc"
+                        },
+                        {
+                            "key": "keyword",
+                            "value": "",
+                            "description": "Từ khóa tìm kiếm (tìm trong device name, time)"
+                        }
+                    ]
+                },
+                "description": "Lấy lịch sử hoạt động với pagination, sorting và search"
+            }
+        },
+        {
+            "name": "3. Data Sensor (Table)",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "http://localhost:3000/api/data-sensor?page=1&limit=20&sortBy=id&sortOrder=desc&keyword=",
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "3000",
+                    "path": [
+                        "api",
+                        "data-sensor"
+                    ],
+                    "query": [
+                        {
+                            "key": "page",
+                            "value": "1",
+                            "description": "Số trang"
+                        },
+                        {
+                            "key": "limit",
+                            "value": "20",
+                            "description": "Số bản ghi mỗi trang"
+                        },
+                        {
+                            "key": "sortBy",
+                            "value": "id",
+                            "description": "Cột sắp xếp: id, temperature, humidity, light, time"
+                        },
+                        {
+                            "key": "sortOrder",
+                            "value": "desc",
+                            "description": "Thứ tự: asc, desc"
+                        },
+                        {
+                            "key": "keyword",
+                            "value": "",
+                            "description": "Từ khóa tìm kiếm (tìm trong temp, hum, light, time)"
+                        }
+                    ]
+                },
+                "description": "Lấy dữ liệu sensor dạng table với pagination và search"
+            }
+        },
+        {
+            "name": "3. Data Sensor (Chart)",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "http://localhost:3000/api/data-sensor?type=chart&limit=20",
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "3000",
+                    "path": [
+                        "api",
+                        "data-sensor"
+                    ],
+                    "query": [
+                        {
+                            "key": "type",
+                            "value": "chart",
+                            "description": "Loại dữ liệu: chart"
+                        },
+                        {
+                            "key": "limit",
+                            "value": "20",
+                            "description": "Số bản ghi (mặc định 20)"
+                        }
+                    ]
+                },
+                "description": "Lấy dữ liệu sensor cho biểu đồ"
+            }
+        },
+        {
+            "name": "3. Data Sensor (Latest)",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "http://localhost:3000/api/data-sensor?type=latest",
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "3000",
+                    "path": [
+                        "api",
+                        "data-sensor"
+                    ],
+                    "query": [
+                        {
+                            "key": "type",
+                            "value": "latest",
+                            "description": "Loại dữ liệu: latest"
+                        }
+                    ]
+                },
+                "description": "Lấy dữ liệu sensor mới nhất cho dashboard"
+            }
+        }
+    ]
+}
