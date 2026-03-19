@@ -1,24 +1,8 @@
-/**
- * ===========================================
- * Sensor Model - MySQL Database Operations
- * ===========================================
- * File: backend/models/Sensor.js
- * Mô tả: Model xử lý các thao tác với bảng datasensor
- *        Chứa dữ liệu nhiệt độ, độ ẩm, ánh sáng
- */
-
 const { pool } = require('../config/database');
 
-/**
- * Class Sensor - Quản lý dữ liệu cảm biến
- */
 class Sensor {
-    /**
-     * Lấy tất cả dữ liệu sensor với pagination
-     * @param {number} page - Số trang (bắt đầu từ 1)
-     * @param {number} limit - Số bản ghi mỗi trang
-     * @returns {Promise<Object>} - Danh sách data và thông tin pagination
-     */
+    
+    // Lấy tất cả dữ liệu sensor với pagination
     static async getAllData(page = 1, limit = 20, sortBy = 'id', sortOrder = 'desc') {
         try {
             // Mapping sort columns
@@ -65,13 +49,8 @@ class Sensor {
         }
     }
 
-    /**
-     * Thêm mới dữ liệu sensor
-     * @param {number} temperature - Nhiệt độ (°C)
-     * @param {number} humidity - Độ ẩm (%)
-     * @param {number} light - Độ sáng (Lux)
-     * @returns {Promise<Object>} - Bản ghi vừa thêm
-     */
+
+    //  Thêm mới dữ liệu sensor
     static async createDataSensor(temperature, humidity, light) {
         try {
             const [result] = await pool.query(
@@ -94,13 +73,8 @@ class Sensor {
         }
     }
 
-    /**
-     * Tìm kiếm dữ liệu sensor theo điều kiện
-     * @param {Object} filters - Các điều kiện lọc
-     * @param {number} page - Số trang
-     * @param {number} limit - Số bản ghi mỗi trang
-     * @returns {Promise<Object>} - Kết quả tìm kiếm
-     */
+    
+    // Tìm kiếm dữ liệu sensor theo điều kiện
     static async search(filters = {}, page = 1, limit = 20, sortBy = 'id', sortOrder = 'desc') {
         try {
             // Mapping sort columns
@@ -124,7 +98,7 @@ class Sensor {
                     CAST(temperature AS CHAR) LIKE ? OR 
                     CAST(humidity AS CHAR) LIKE ? OR 
                     CAST(light AS CHAR) LIKE ? OR
-                    DATE_FORMAT(created_at, '%H:%i:%s %e/%c/%Y') LIKE ? OR
+                    DATE_FORMAT(created_at, '%H:%i:%s %d/%m/%Y') LIKE ? OR
                     CAST(created_at AS CHAR) LIKE ?
                 )`;
                 params.push(key, key, key, key, key);
@@ -207,11 +181,7 @@ class Sensor {
         }
     }
 
-    /**
-     * Lấy dữ liệu sensor gần nhất (cho chart)
-     * @param {number} limit - Số records gần nhất
-     * @returns {Promise<Array>} - Danh sách data points
-     */
+    // Lấy dữ liệu sensor gần nhất (cho chart)
     static async getData(limit = 20) {
         try {
             const [rows] = await pool.query(

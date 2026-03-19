@@ -1,24 +1,7 @@
-/**
- * ===========================================
- * History Model - MySQL Database Operations
- * ===========================================
- * File: backend/models/History.js
- * Mô tả: Model xử lý các thao tác với bảng active_history
- *        Lưu trữ lịch sử hoạt động của thiết bị
- */
-
 const { pool } = require('../config/database');
 
-/**
- * Class History - Quản lý lịch sử hoạt động
- */
 class History {
-    /**
-     * Lấy tất cả lịch sử hoạt động với pagination
-     * @param {number} page - Số trang (bắt đầu từ 1)
-     * @param {number} limit - Số bản ghi mỗi trang
-     * @returns {Promise<Object>} - Danh sách lịch sử và thông tin pagination
-     */
+    //  Lấy tất cả lịch sử hoạt động với pagination
     static async getAllData(page = 1, limit = 20, sortBy = 'id', sortOrder = 'desc') {
         try {
             // Mapping sort columns
@@ -66,13 +49,7 @@ class History {
         }
     }
 
-    /**
-     * Tạo bản ghi lịch sử mới
-     * @param {number} deviceId - ID thiết bị
-     * @param {string} action - Hành động (ON, OFF)
-     * @param {string} status - Trạng thái 
-     * @returns {Promise<Object>} - Bản ghi vừa tạo
-     */
+    //  * Tạo bản ghi lịch sử mới
     static async createAction(deviceId, action, status) {
         try {
 
@@ -96,11 +73,7 @@ class History {
         }
     }
 
-    /**
-     * Cập nhật trạng thái của bản ghi lịch sử
-     * @param {number} historyId - ID của bản ghi lịch sử
-     * @param {string} status - Trạng thái
-     */
+    //  Cập nhật trạng thái của bản ghi lịch sử
     static async updateStatus(historyId, status) {
         try {
             await pool.query(
@@ -114,13 +87,8 @@ class History {
         }
     }
 
-    /**
-     * Tìm kiếm lịch sử theo điều kiện
-     * @param {Object} filters - Các điều kiện lọc
-     * @param {number} page - Số trang
-     * @param {number} limit - Số bản ghi mỗi trang
-     * @returns {Promise<Object>} - Kết quả tìm kiếm
-     */
+    // Tìm kiếm lịch sử theo điều kiện
+
     static async search(filters = {}, page = 1, limit = 20, sortBy = 'id', sortOrder = 'desc') {
         try {
             // Mapping sort columns
@@ -141,8 +109,8 @@ class History {
             if (filters.keyword) {
                 const key = `%${filters.keyword}%`;
                 whereClause += ` AND (
-                    d.name LIKE ? OR 
-                    DATE_FORMAT(h.created_at, '%H:%i:%s %e/%c/%Y') LIKE ? OR
+                    d.name LIKE ? OR
+                    DATE_FORMAT(h.created_at, '%H:%i:%s %d/%m/%Y') LIKE ? OR
                     CAST(h.created_at AS CHAR) LIKE ?
                 )`;
                 params.push(key, key, key);
@@ -224,41 +192,6 @@ class History {
         }
     }
 
-    /**
-     * Lấy trạng thái hiện tại của tất cả thiết bị
-     * @returns {Promise<Object>} - Object với key là device_id, value là action cuối cùng
-     */
-    static async getDeviceStates() {
-        try {
-            const [rows] = await pool.query(
-                `SELECT h.device_id, h.action, h.status, d.name as device_name
-                 FROM active_history h
-                 INNER JOIN (
-                     SELECT device_id, MAX(id) as max_id
-                     FROM active_history
-                     GROUP BY device_id
-                 ) latest ON h.id = latest.max_id
-                 LEFT JOIN devices d ON h.device_id = d.id`
-            );
-
-            // Chuyển thành object dễ truy cập
-            const states = {};
-            rows.forEach(row => {
-                const isActuallyOn = row.status === 'ON' || row.status === 'Bật';
-                states[row.device_id] = {
-                    name: row.device_name,
-                    action: row.action,
-                    status: row.status,
-                    isOn: isActuallyOn
-                };
-            });
-
-            return states;
-        } catch (error) {
-            console.error('❌ Lỗi History.getDeviceStates:', error.message);
-            throw error;
-        }
-    }
 }
 
 module.exports = History;

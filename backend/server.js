@@ -2,7 +2,7 @@ require('dotenv').config();
 const app = require('./app');
 const { testConnection } = require('./config/database');
 const mqttService = require('./services/mqttService');
-const Device = require('./models/Device');
+const Device = require('./models/DeviceModel');
 
 // Lấy port từ environment hoặc mặc định 3000
 const PORT = process.env.PORT || 3000;
@@ -14,7 +14,6 @@ const startServer = async () => {
     console.log('🚀 IoT Smart Home Server starting...');
 
     try {
-        // ===== BƯỚC 1: Kết nối Database =====
         const dbConnected = await testConnection();
 
         if (!dbConnected) {
@@ -22,11 +21,9 @@ const startServer = async () => {
             process.exit(1);
         }
 
-        // ===== BƯỚC 2: Khởi tạo dữ liệu & MQTT =====
         await Device.initializeDefaultDevices();
         mqttService.initialize();
 
-        // ===== BƯỚC 3: Start Server =====
         app.listen(PORT, () => {
             console.log(`✅ Server is running at http://localhost:${PORT}`);
             console.log('--------------------------------------------------');

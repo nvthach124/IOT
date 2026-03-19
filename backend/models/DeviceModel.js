@@ -8,29 +8,34 @@
  */
 
 const { pool } = require('../config/database');
+const { DEVICES } = require('../config/constants');
+
+const deviceStates = {};
+
+Object.values(DEVICES).forEach((device) => {
+    deviceStates[device.code] = 'OFF';
+});
 
 /**
  * Class Device - Quản lý thiết bị điều khiển
  */
 class Device {
-    /**
-     * Lấy danh sách tất cả thiết bị
-     * @returns {Promise<Array>} - Danh sách thiết bị
-     */
-    static async getAllData() {
-        try {
-            const [rows] = await pool.query(
-                `SELECT id, name, 
-                        DATE_FORMAT(created_at, '%H:%i:%s %d/%m/%Y') as created_at
-                 FROM devices 
-                 ORDER BY id ASC`
-            );
-            return rows;
-        } catch (error) {
-            console.error('❌ Lỗi Device.getAllData:', error.message);
-            throw error;
-        }
+    static getDeviceStates() {
+        return { ...deviceStates };
     }
+
+    static getDeviceStateByCode(deviceCode) {
+        if (!deviceCode) return 'OFF';
+        return deviceStates[deviceCode.toLowerCase()] || 'OFF';
+    }
+
+    static setDeviceStateByCode(deviceCode, status) {
+        if (!deviceCode) return;
+        const code = deviceCode.toLowerCase();
+        if (!(code in deviceStates)) return;
+        deviceStates[code] = status?.toString().toUpperCase() === 'ON' ? 'ON' : 'OFF';
+    }
+
 
     /**
      * Lấy thông tin thiết bị theo ID
@@ -40,8 +45,7 @@ class Device {
     static async getById(id) {
         try {
             const [rows] = await pool.query(
-                `SELECT id, name, 
-                        DATE_FORMAT(created_at, '%H:%i:%s %d/%m/%Y') as created_at
+                `SELECT id, name, DATE_FORMAT(created_at, '%H:%i:%s %d/%m/%Y') as created_at
                  FROM devices 
                  WHERE id = ?`,
                 [id]
@@ -53,26 +57,6 @@ class Device {
         }
     }
 
-    /**
-     * Lấy thông tin thiết bị theo tên
-     * @param {string} name - Tên thiết bị
-     * @returns {Promise<Object|null>} - Thông tin thiết bị hoặc null
-     */
-    static async getByName(name) {
-        try {
-            const [rows] = await pool.query(
-                `SELECT id, name, 
-                        DATE_FORMAT(created_at, '%H:%i:%s %d/%m/%Y') as created_at
-                 FROM devices 
-                 WHERE name LIKE ?`,
-                [`%${name}%`]
-            );
-            return rows[0] || null;
-        } catch (error) {
-            console.error('❌ Lỗi Device.getByName:', error.message);
-            throw error;
-        }
-    }
 
     /**
      * Thêm mới thiết bị
@@ -104,8 +88,8 @@ class Device {
         try {
             // Danh sách thiết bị mặc định
             const defaultDevices = [
-                { id: 1, name: 'Lamp' },      // Lamp
-                { id: 2, name: 'Fan' },     // Fan
+                { id: 1, name: 'Lamp' },      
+                { id: 2, name: 'Fan' },     
                 { id: 3, name: 'Pump' },
             ];
 

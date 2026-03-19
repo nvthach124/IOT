@@ -10,25 +10,20 @@ const cors = require('cors');
 const path = require('path');
 require('dotenv').config();
 
+const errorHandler = require('./middlewares/errorHandler');
+
 // Import routes
-const deviceControlRoutes = require('./routes/deviceControlRoutes');
-const historyRoutes = require('./routes/historyRoutes');
-const sensorRoutes = require('./routes/sensorRoutes');
+const router = require('./routes');
 
 // Khởi tạo Express app
 const app = express();
 
 // ===== MIDDLEWARE =====
 
-app.use(cors({
-    origin: '*',
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization']
-}));
-
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, '../frontend')));
+app.use(express.static(path.join(__dirname, '../frontend/dist')));
 app.use('/docs', express.static(path.join(__dirname, '../docs')));
 
 app.use((req, res, next) => {
@@ -37,26 +32,17 @@ app.use((req, res, next) => {
     next();
 });
 
-// ===== API ROUTES (3 endpoints) =====
+// ===== API ROUTES  =====
+app.use('/api', router);
 
-app.use('/api/device-control', deviceControlRoutes);
-app.use('/api/active-history', historyRoutes);
-app.use('/api/data-sensor', sensorRoutes);
+// ===== FRONTEND ROUTES (SPA fallback) =====
 
-
-// ===== FRONTEND ROUTES =====
-
-app.get('/', (req, res) => {
-    res.redirect('/dashboard.html');
+app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api/') || req.path.startsWith('/docs/')) return next();
+    res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
 });
 
-
-app.use((error, req, res, next) => {
-    console.error('❌ Server Error:', error);
-    res.status(error.status || 500).json({
-        success: false,
-        message: error.message || 'Internal Server Error'
-    });
-});
+// ===== GLOBAL ERROR HANDLER =====
+app.use(errorHandler);
 
 module.exports = app;
